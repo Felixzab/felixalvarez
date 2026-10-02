@@ -35,17 +35,27 @@ ProcesoPrompter := "Camera Hub.exe"
 
 ; ---------------------------------------------------------------------
 
-TrayTip "Pedal de teleprompter activo", "Pausa = activar/desactivar", 1
+; Aviso visible al arrancar (se cierra solo a los 4 segundos)
+MsgBox "El script del pedal esta funcionando.`n`nDeja el puntero sobre la pantalla del Prompter`ny manten pulsado un boton lateral del raton.", "Pedal de teleprompter", "T4"
+
+; true -> muestra un aviso junto al cursor mientras pulsas un boton lateral.
+; Sirve para comprobar que el raton llega al script. Ponlo en false cuando ya funcione.
+MostrarAvisos := true
 
 Desplazar(boton, direccion) {
-    global RetardoInicialMs, RetardoMinimoMs, AceleracionMs, PasosPorTick
+    global RetardoInicialMs, RetardoMinimoMs, AceleracionMs, PasosPorTick, MostrarAvisos
     retardo := RetardoInicialMs
+    pasos := 0
     while GetKeyState(boton, "P") {
         Send "{" direccion " " PasosPorTick "}"
+        pasos += 1
+        if MostrarAvisos
+            ToolTip (direccion = "WheelUp" ? "RETROCEDIENDO" : "AVANZANDO") " (" boton ")  pasos: " pasos
         Sleep retardo
         if (retardo > RetardoMinimoMs)
             retardo := Max(RetardoMinimoMs, retardo - AceleracionMs)
     }
+    ToolTip
 }
 
 #HotIf !SoloEnPrompter || WinActive("ahk_exe " ProcesoPrompter)
